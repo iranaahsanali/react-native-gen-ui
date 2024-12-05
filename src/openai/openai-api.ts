@@ -8,9 +8,13 @@ import {
 export class OpenAIApi {
   apiKey: string;
   basePath: string;
-  constructor({ apiKey, basePath }: { apiKey: string; basePath?: string }) {
+  customServerPath?: string;
+  takeOnlyLastInput?: boolean;
+  constructor({ apiKey, basePath, customServerPath, takeOnlyLastInput }: { apiKey: string; basePath?: string; customServerPath?: string; takeOnlyLastInput?: boolean}) {
     this.apiKey = apiKey;
     this.basePath = basePath ?? OPENAI_BASE_PATH;
+    this.customServerPath = customServerPath;
+    this.takeOnlyLastInput =  takeOnlyLastInput ?? false;
   }
 
   public createChatCompletion(

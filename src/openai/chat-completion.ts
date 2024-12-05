@@ -93,6 +93,7 @@ export class ChatCompletion {
   start() {
     // Create a new event source using Completions API
     this.eventSource = new EventSource<string>(
+      this.api.customServerPath ? this.api.customServerPath :
       `${this.api.basePath}/chat/completions`,
       {
         headers: {
@@ -102,7 +103,9 @@ export class ChatCompletion {
         // Do not poll, just connect once
         pollingInterval: 0,
         method: 'POST',
-        body: this.serializeParams(),
+        body: this.api.takeOnlyLastInput ? JSON.stringify({
+          query: this.params.messages[this.params.messages.length - 1].content
+        }) : this.serializeParams(),
       },
     );
 
