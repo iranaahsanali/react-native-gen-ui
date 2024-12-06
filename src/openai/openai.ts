@@ -9,6 +9,8 @@ export type OpenAIApiParams = {
   apiKey: string;
   model: string;
   basePath?: string;
+  customServerPath?: string;
+  takeOnlyLastInput?: boolean;
 };
 
 // OpenAI class mimics some functionality from the official [OpenAI TypeScript Library](https://github.com/openai/openai-node)
@@ -16,10 +18,18 @@ export class OpenAI {
   private api: OpenAIApi;
   private model: string;
 
-  constructor({ apiKey, model, basePath }: OpenAIApiParams) {
+  constructor({
+    apiKey,
+    model,
+    basePath,
+    customServerPath,
+    takeOnlyLastInput,
+  }: OpenAIApiParams) {
     this.api = new OpenAIApi({
       apiKey,
       basePath,
+      customServerPath,
+      takeOnlyLastInput,
     });
     this.model = model;
   }
