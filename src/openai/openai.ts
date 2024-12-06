@@ -7,7 +7,7 @@ import { OpenAIApi } from './openai-api';
 // OpenAI API parameters
 export type OpenAIApiParams = {
   apiKey: string;
-  model: string;
+  model?: string;
   basePath?: string;
   customServerPath?: string;
   takeOnlyLastInput?: boolean;
@@ -31,7 +31,7 @@ export class OpenAI {
       customServerPath,
       takeOnlyLastInput,
     });
-    this.model = model;
+    this.model = model ?? '';
   }
 
   private getApi() {
