@@ -12,6 +12,8 @@ export class OpenAIApi {
   takeOnlyLastInput?: boolean;
   contentNodeName: string;
   completionNodeName: string;
+  additionalHeaders?: any;
+  additionalBody?: any;
   constructor({
     apiKey,
     basePath,
@@ -19,6 +21,8 @@ export class OpenAIApi {
     takeOnlyLastInput,
     contentNodeName,
     completionNodeName,
+    additionalHeaders,
+    additionalBody,
   }: {
     apiKey: string;
     basePath?: string;
@@ -26,6 +30,8 @@ export class OpenAIApi {
     takeOnlyLastInput?: boolean;
     contentNodeName: string;
     completionNodeName: string;
+    additionalHeaders?: any;
+    additionalBody?: any;
   }) {
     this.apiKey = apiKey;
     this.basePath = basePath ?? OPENAI_BASE_PATH;
@@ -33,6 +39,8 @@ export class OpenAIApi {
     this.takeOnlyLastInput = takeOnlyLastInput ?? false;
     this.contentNodeName = contentNodeName;
     this.completionNodeName = completionNodeName;
+    this.additionalHeaders = additionalHeaders;
+    this.additionalBody = additionalBody;
   }
 
   public createChatCompletion(

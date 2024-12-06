@@ -100,14 +100,16 @@ export class ChatCompletion {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${this.api.apiKey}`,
+          ...(this.api.additionalHeaders || {}),
         },
         // Do not poll, just connect once
         pollingInterval: 0,
         method: 'POST',
         body: this.api.takeOnlyLastInput
           ? JSON.stringify({
-              query:
+              question:
                 this.params.messages[this.params.messages.length - 1].content,
+              ...(this.api.additionalBody || {}),
             })
           : this.serializeParams(),
       },

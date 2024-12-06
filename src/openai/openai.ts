@@ -13,6 +13,8 @@ export type OpenAIApiParams = {
   takeOnlyLastInput?: boolean;
   contentNodeName: string;
   completionNodeName: string;
+  additionalHeaders?: any;
+  additionalBody?: any;
 };
 
 // OpenAI class mimics some functionality from the official [OpenAI TypeScript Library](https://github.com/openai/openai-node)
@@ -28,6 +30,8 @@ export class OpenAI {
     takeOnlyLastInput,
     contentNodeName,
     completionNodeName,
+    additionalHeaders,
+    additionalBody,
   }: OpenAIApiParams) {
     this.api = new OpenAIApi({
       apiKey,
@@ -36,6 +40,8 @@ export class OpenAI {
       takeOnlyLastInput,
       contentNodeName,
       completionNodeName,
+      additionalHeaders,
+      additionalBody,
     });
     this.model = model ?? '';
   }
