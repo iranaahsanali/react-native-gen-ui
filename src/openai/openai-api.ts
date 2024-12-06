@@ -10,11 +10,29 @@ export class OpenAIApi {
   basePath: string;
   customServerPath?: string;
   takeOnlyLastInput?: boolean;
-  constructor({ apiKey, basePath, customServerPath, takeOnlyLastInput }: { apiKey: string; basePath?: string; customServerPath?: string; takeOnlyLastInput?: boolean}) {
+  contentNodeName: string;
+  completionNodeName: string;
+  constructor({
+    apiKey,
+    basePath,
+    customServerPath,
+    takeOnlyLastInput,
+    contentNodeName,
+    completionNodeName,
+  }: {
+    apiKey: string;
+    basePath?: string;
+    customServerPath?: string;
+    takeOnlyLastInput?: boolean;
+    contentNodeName: string;
+    completionNodeName: string;
+  }) {
     this.apiKey = apiKey;
     this.basePath = basePath ?? OPENAI_BASE_PATH;
     this.customServerPath = customServerPath;
-    this.takeOnlyLastInput =  takeOnlyLastInput ?? false;
+    this.takeOnlyLastInput = takeOnlyLastInput ?? false;
+    this.contentNodeName = contentNodeName;
+    this.completionNodeName = completionNodeName;
   }
 
   public createChatCompletion(

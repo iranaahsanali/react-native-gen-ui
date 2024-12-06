@@ -93,8 +93,9 @@ export class ChatCompletion {
   start() {
     // Create a new event source using Completions API
     this.eventSource = new EventSource<string>(
-      this.api.customServerPath ? this.api.customServerPath :
-      `${this.api.basePath}/chat/completions`,
+      this.api.customServerPath
+        ? this.api.customServerPath
+        : `${this.api.basePath}/chat/completions`,
       {
         headers: {
           'Content-Type': 'application/json',
@@ -103,9 +104,12 @@ export class ChatCompletion {
         // Do not poll, just connect once
         pollingInterval: 0,
         method: 'POST',
-        body: this.api.takeOnlyLastInput ? JSON.stringify({
-          query: this.params.messages[this.params.messages.length - 1].content
-        }) : this.serializeParams(),
+        body: this.api.takeOnlyLastInput
+          ? JSON.stringify({
+              query:
+                this.params.messages[this.params.messages.length - 1].content,
+            })
+          : this.serializeParams(),
       },
     );
 
@@ -127,76 +131,32 @@ export class ChatCompletion {
 
   // Handles a new chunk received
   private handleNewChunk(event: EventSourceEvent<'message'>) {
+    // Parse the message as a ChatCompletionChunk
+    const e = JSON.parse(event.data!) as any;
+
     // If [DONE], close the connection and mark as done
-    if (event.data === '[DONE]') {
+    if (e?.[`${this.api.completionNodeName}`] == true) {
       this.eventSource?.close();
       return;
     }
 
     // Handle the case of an empty message
-    if (!event.data) {
+    if (
+      !e?.[this.api.contentNodeName] ||
+      e?.[this.api.contentNodeName]?.length == 0
+    ) {
       console.error('Empty message received.');
       this.callbacks.onError?.(new Error('Empty message received.'));
       return;
     }
 
-    // Parse the message as a ChatCompletionChunk
-    const e = JSON.parse(event.data) as ChatCompletionChunk;
-
-    // Again, handle empty messages
-    if (e.choices == null || e.choices.length === 0) {
-      return;
-    }
-
     // This library currently only supports one choice
-    const firstChoice = e.choices[0];
-
-    // If the model stops because of a tool call, call the tool
-    if (firstChoice.finish_reason === 'tool_calls') {
-      void this.handleToolCall();
-      return;
-    }
-
-    // If the model stops, that is it
-    if (firstChoice.finish_reason === 'stop') {
-      // Call onDone
-      this.callbacks.onDone?.([
-        {
-          content: this.newMessage,
-          role: 'assistant',
-        },
-      ]);
-
-      // Mark as finished
-      this.finished = true;
-      return;
-    }
+    const content = e?.[this.api.contentNodeName];
 
     // Handle normal text token delta
-    if (firstChoice.delta.content != null) {
-      this.newMessage += firstChoice.delta.content;
+    if (content != null) {
+      this.newMessage += content;
       this.notifyChunksReceived();
-      return;
-    }
-
-    // Handle tool calls
-    if (
-      firstChoice.delta.tool_calls != null &&
-      firstChoice.delta.tool_calls.length > 0
-    ) {
-      // TODO: OpenAI supports multiple parallel tool calls, this library does not (yet)
-      const firstToolCall = firstChoice.delta.tool_calls[0];
-
-      // Append function name if available
-      if (firstToolCall.function?.name) {
-        this.newToolCall.name += firstToolCall.function.name;
-      }
-
-      // Append function arguments if available
-      if (firstToolCall.function?.arguments) {
-        this.newToolCall.arguments += firstToolCall.function.arguments;
-      }
-
       return;
     }
 
